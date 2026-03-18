@@ -1,0 +1,91 @@
+@page "/"
+@using MuddyStargateWasm.Models
+@using System.Text
+
+
+<PageTitle>Home</PageTitle>
+
+<MudText Align="Align.Center" Typo="Typo.h4" GutterBottom="true">Found @OpenGates.Count() open gates with @TotalUsers() active user@(TotalUsers() != 1 ? "s" : "")!</MudText>
+
+<MudGrid Spacing="3">
+    @* <MudVirtualize Items="@OpenGates" ItemSize="250" OverscanCount="20" Context="gate" @ref="_virtualizeRef"> *@
+        
+    @foreach (var gate in OpenGates.OrderByDescending(x => x.active_users))
+    {
+        gate.gate_status = CoinFlip()? "IDLE" : "ACTIVE";
+        <MudItem xs="6" sm="4" md="3" lg="2">
+            <MudCard Outlined="true"
+                     Square="false"
+                     Style="overflow: hidden"
+                     Class=@GetGateCardClass(gate)>
+
+                <MudCardHeader>
+                    <MudTooltip Text="@gate.session_name" Placement="Placement.Bottom">
+                        <MudText Class="clamp-1" Typo="Typo.h6" Color="@(gate.iris_state ? Color.Error : Color.Default)">@gate.session_name</MudText>
+                    </MudTooltip>
+                    <MudSpacer />
+                    <MudTooltip Text=@(gate.is_headless? "Headless" : "User hosted")>
+                        <MudIcon Icon=@(gate.is_headless? @Icons.Material.Filled.Storage : @Icons.Material.Filled.Person)/>
+                    </MudTooltip>                    
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Inline="true">Address: </MudText><MudText Inline="true" Color="Color.Secondary">@gate.gate_address</MudText><MudText Inline="true" Color="Color.Primary">@gate.gate_code</MudText>
+                    <MudSpacer />
+                    <MudText Inline="true">Users: @gate.active_users</MudText><MudText Inline="true">/@gate.max_users</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    @if (gate.gate_status != "IDLE")
+                    {
+                        <MudChip  T="string" Color="Color.Info" Variant="Variant.Text">@gate.gate_status</MudChip>
+                    }
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    }
+
+    @* </MudVirtualize> *@
+</MudGrid>
+
+@code{
+
+    public string status { get; set; } = "N/A";
+    private IEnumerable<StargateModel> OpenGates { get; set; } = new StargateModel[0];
+    //private MudVirtualize<StargateModel>? _virtualizeRef;
+
+    async void UpdateGatesAsync()
+    {
+        var http = new HttpClient();
+        var data = await http.GetFromJsonAsync<List<StargateModel>>("https://cors.anxiety-squad.de/");
+
+        if (data != null)
+        {
+            OpenGates = data;
+            //await _virtualizeRef.RefreshDataAsync();
+        }
+
+        StateHasChanged();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            UpdateGatesAsync();
+        }
+    }
+
+    private int TotalUsers() => OpenGates.Sum(x => x.active_users);
+
+    private bool CoinFlip() => new Random().Next(2) == 1;
+
+    private string GetGateCardClass(StargateModel gate)
+    {
+        var sb = new StringBuilder();
+        sb.Append("hover-card ");
+        if (gate.gate_status != "IDLE")
+        {
+            sb.Append("active-gate ");
+        }
+        return sb.ToString();
+    }
+}
