@@ -39,12 +39,16 @@
             _ => StargateType.Unknown
         };
 
+        public bool UseCustomFont { get; set; } = true;
+
         // https://www.thescifiworld.net/fonts.htm
         public string AddressFontClass => Type switch
         {
+            var code when !UseCustomFont => "",
             StargateType.Destiny => "stargate-universe-font",
             StargateType.MilkyWay => "stargate-milkyway-goauld-font",
             StargateType.Pegasus => "stargate-pegasus-font",
+            
             _ => ""
         };
     }

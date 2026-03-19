@@ -14,6 +14,7 @@
         
     @foreach (var gate in OpenGates.OrderByDescending(x => x.active_users))
     {
+        gate.UseCustomFont = false;
         #if DEBUG
         //gate.gate_status = CoinFlip()? "IDLE" : "OPEN"; // IDLE, OPEN
         #endif
