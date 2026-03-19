@@ -5,14 +5,16 @@
 
 <PageTitle>Home</PageTitle>
 
-<MudText Align="Align.Center" Typo="Typo.h4" GutterBottom="true">Found @OpenGates.Count() open gates with @TotalUsers() active user@(TotalUsers() != 1 ? "s" : "")!</MudText>
+<MudText Align="Align.Center" Typo="Typo.h4" GutterBottom="true">Found @OpenGates.Count() open gates with @TotalUsers() active user@(TotalUsers() != 1 ? "s" : "")! @DateTime.Now</MudText>
 
 <MudGrid Spacing="3">
     @* <MudVirtualize Items="@OpenGates" ItemSize="250" OverscanCount="20" Context="gate" @ref="_virtualizeRef"> *@
         
     @foreach (var gate in OpenGates.OrderByDescending(x => x.active_users))
     {
-        gate.gate_status = CoinFlip()? "IDLE" : "ACTIVE";
+        #if DEBUG
+        //gate.gate_status = CoinFlip()? "IDLE" : "OPEN"; // IDLE, OPEN
+        #endif
         <MudItem xs="6" sm="4" md="3" lg="2">
             <MudCard Outlined="true"
                      Square="false"
