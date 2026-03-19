@@ -28,17 +28,15 @@
                         <MudText Class="clamp-1" Typo="Typo.h6" Color="@(gate.iris_state ? Color.Error : Color.Default)">@gate.session_name</MudText>
                     </MudTooltip>
                     <MudSpacer />
-                    <MudTooltip Text=@(gate.is_headless? "Headless" : "User hosted")>
+                    <MudTooltip Text=@(gate.is_headless? "Headless" : "User hosted") >
                         <MudIcon Icon=@(gate.is_headless? @Icons.Material.Filled.Storage : @Icons.Material.Filled.Person)/>
                     </MudTooltip>                    
                 </MudCardHeader>
                 <MudCardContent>
                     
                     <MudLink OnClick="@(_ => CopyTextToClipboard(gate.FullCode))" EndIcon="@Icons.Material.Filled.ContentCopy" Color="Color.Inherit">
-                        <MudText Inline="true">Address: </MudText><MudText Inline="true" Color="Color.Secondary">@gate.gate_address</MudText><MudText Inline="true" Color="Color.Primary">@gate.gate_code</MudText>
+                        <MudText Inline="true">Address: </MudText><MudText Class="@gate.AddressFontClass" Inline="true" Color="Color.Secondary">@gate.gate_address</MudText><MudText Class="@gate.AddressFontClass" Inline="true" Color="Color.Primary">@gate.CleanCode</MudText>
                     </MudLink>
-                    
-                    
                     
                     @* <MudIcon Icon="@Icons.Material.Filled.ContentCopy" Size="Size.Small" /> *@
                     <MudSpacer />
@@ -58,16 +56,17 @@
     @* </MudVirtualize> *@
 </MudGrid>
 
+
 @code{
 
     public string status { get; set; } = "N/A";
-    private IEnumerable<StargateModel> OpenGates { get; set; } = new StargateModel[0];
+    private IEnumerable<StargateInfo> OpenGates { get; set; } = new StargateInfo[0];
     //private MudVirtualize<StargateModel>? _virtualizeRef;
 
     async void UpdateGatesAsync()
     {
         var http = new HttpClient();
-        var data = await http.GetFromJsonAsync<List<StargateModel>>("https://cors.anxiety-squad.de/");
+        var data = await http.GetFromJsonAsync<List<StargateInfo>>("https://cors-proxy.djs-cors-proxy.workers.dev/");
 
         if (data != null)
         {
@@ -90,7 +89,7 @@
 
     private bool CoinFlip() => new Random().Next(2) == 1;
 
-    private string GetGateCardClass(StargateModel gate)
+    private string GetGateCardClass(StargateInfo gate)
     {
         var sb = new StringBuilder();
         sb.Append("hover-card ");

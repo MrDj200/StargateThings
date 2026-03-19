@@ -27,3 +27,46 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+/* https://www.thescifiworld.net/fonts.htm */
+@font-face {
+    font-family: 'StargateUniverse';
+    src: url('/fonts/StargateUniverse.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+.stargate-universe-font {
+    font-family: 'StargateUniverse', sans-serif;
+}
+
+@font-face {
+    font-family: 'StargateMilkyWay';
+    src: url('/fonts/stargate_sg1_adress_glyphs.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.stargate-milkyway-font {
+    font-family: 'StargateMilkyWay', sans-serif;
+}
+
+@font-face {
+    font-family: 'StargateMilkyWayGoauld';
+    src: url('/fonts/stargate_sg1_goauld.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.stargate-milkyway-goauld-font {
+    font-family: 'StargateMilkyWayGoauld', sans-serif;
+}
+
+@font-face {
+    font-family: 'StargateAtlantis';
+    src: url('/fonts/atlantis-glyphs.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.stargate-pegasus-font {
+    font-family: 'StargateAtlantis', sans-serif;
+}
