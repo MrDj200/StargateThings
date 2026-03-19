@@ -5,7 +5,7 @@
 
 <PageTitle>Home</PageTitle>
 
-<MudText Align="Align.Center" Typo="Typo.h4" GutterBottom="true">Found @OpenGates.Count() open gates with @TotalUsers() active user@(TotalUsers() != 1 ? "s" : "")! @DateTime.Now</MudText>
+<MudText Align="Align.Center" Typo="Typo.h4" GutterBottom="true">Found @OpenGates.Count() open gates with @TotalUsers() active user@(TotalUsers() != 1 ? "s" : "")!</MudText>
 
 <MudGrid Spacing="3">
     @* <MudVirtualize Items="@OpenGates" ItemSize="250" OverscanCount="20" Context="gate" @ref="_virtualizeRef"> *@
