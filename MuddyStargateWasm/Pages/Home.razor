@@ -1,6 +1,8 @@
 @page "/"
 @using MuddyStargateWasm.Models
 @using System.Text
+@inject IJSRuntime JSRuntime
+@inject ISnackbar Snackbar
 
 
 <PageTitle>Home</PageTitle>
@@ -31,9 +33,17 @@
                     </MudTooltip>                    
                 </MudCardHeader>
                 <MudCardContent>
-                    <MudText Inline="true">Address: </MudText><MudText Inline="true" Color="Color.Secondary">@gate.gate_address</MudText><MudText Inline="true" Color="Color.Primary">@gate.gate_code</MudText>
+                    
+                    <MudLink OnClick="@(_ => CopyTextToClipboard(gate.FullCode))" EndIcon="@Icons.Material.Filled.ContentCopy" Color="Color.Inherit">
+                        <MudText Inline="true">Address: </MudText><MudText Inline="true" Color="Color.Secondary">@gate.gate_address</MudText><MudText Inline="true" Color="Color.Primary">@gate.gate_code</MudText>
+                    </MudLink>
+                    
+                    
+                    
+                    @* <MudIcon Icon="@Icons.Material.Filled.ContentCopy" Size="Size.Small" /> *@
                     <MudSpacer />
-                    <MudText Inline="true">Users: @gate.active_users</MudText><MudText Inline="true">/@gate.max_users</MudText>
+                    <MudText Inline="true">Users: </MudText>
+                    <MudText Inline="true" Color=@(gate.active_users < 1 ? Color.Inherit : Color.Success)>@gate.active_users</MudText><MudText Inline="true">/@gate.max_users</MudText>
                 </MudCardContent>
                 <MudCardActions>
                     @if (gate.gate_status != "IDLE")
@@ -89,5 +99,11 @@
             sb.Append("active-gate ");
         }
         return sb.ToString();
+    }
+
+    private async Task CopyTextToClipboard(string text)
+    {
+        await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
+        Snackbar.Add("Gate code copied to clipboard!", Severity.Success);
     }
 }
