@@ -13,6 +13,9 @@
         public bool public_gate { get; set; }
         public bool is_headless { get; set; }
         public bool iris_state { get; set; }
+
+        public string FullCode => $"{gate_address}{gate_code}";
+
     }
 
 
