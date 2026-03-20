@@ -45,10 +45,10 @@
                     <MudText Inline="true" Color=@(gate.active_users < 1 ? Color.Inherit : Color.Success)>@gate.active_users</MudText><MudText Inline="true">/@gate.max_users</MudText>
                 </MudCardContent>
                 <MudCardActions>
-                    @if (gate.gate_status != "IDLE")
+                    @* @if (gate.gate_status != "IDLE")
                     {
                         <MudChip  T="string" Color="Color.Info" Variant="Variant.Text">@gate.gate_status</MudChip>
-                    }
+                    } *@
                 </MudCardActions>
             </MudCard>
         </MudItem>
