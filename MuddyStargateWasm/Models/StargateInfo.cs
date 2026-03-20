@@ -42,6 +42,8 @@
         public bool UseCustomFont { get; set; } = true;
 
         // https://www.thescifiworld.net/fonts.htm
+
+        // TODO: load these: https://github.com/Ancients-of-Resonite/stargate-network/tree/master/apps/sgn-dash/src/assets
         public string AddressFontClass => Type switch
         {
             var code when !UseCustomFont => "",
