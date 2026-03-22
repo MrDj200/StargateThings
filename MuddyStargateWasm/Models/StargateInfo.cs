@@ -11,6 +11,13 @@
         Unknown
     }
 
+    public enum GateStatus
+    {
+        OPEN,
+        IDLE,
+        UNKNOWN
+    }
+
     public class StargateInfo
     {
         public string gate_address { get; set; } = null!;
@@ -37,6 +44,13 @@
             var code when code == "P@" => StargateType.Pegasus,
             var code when code == "??" => StargateType.Aperture, // TODO: Find out what the code for Aperture is, this is just a placeholder
             _ => StargateType.Unknown
+        };
+
+        public GateStatus Status => gate_status switch
+        {
+            var code when code == "IDLE" => GateStatus.IDLE,
+            var code when code == "OPEN" => GateStatus.OPEN,
+            _ => GateStatus.UNKNOWN
         };
 
         public bool UseCustomFont { get; set; } = true;

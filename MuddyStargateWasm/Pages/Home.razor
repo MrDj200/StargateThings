@@ -88,7 +88,7 @@
 
     private int TotalUsers() => ActiveGates.Sum(x => x.active_users);
 
-    private IEnumerable<StargateInfo> OpenGates() => ActiveGates.Where(x => x.gate_status == "OPEN");
+    private IEnumerable<StargateInfo> OpenGates() => ActiveGates.Where(x => x.Status == GateStatus.OPEN);
 
     private bool CoinFlip() => new Random().Next(2) == 1;
 
@@ -96,7 +96,7 @@
     {
         var sb = new StringBuilder();
         sb.Append("hover-card ");
-        if (gate.gate_status != "IDLE")
+        if (gate.Status == GateStatus.OPEN)
         {
             sb.Append("active-gate ");
         }
