@@ -7,12 +7,12 @@
 
 <PageTitle>Home</PageTitle>
 
-<MudText Align="Align.Center" Typo="Typo.h4" GutterBottom="true">Found @OpenGates.Count() open gates with @TotalUsers() active user@(TotalUsers() != 1 ? "s" : "")!</MudText>
+<MudText Align="Align.Center" Typo="Typo.h4" GutterBottom="true">Found @ActiveGates.Count() active gates with @TotalUsers() active user@(TotalUsers() != 1 ? "s" : "")! @OpenGates().Count() open gates</MudText>
 
 <MudGrid Spacing="3">
     @* <MudVirtualize Items="@OpenGates" ItemSize="250" OverscanCount="20" Context="gate" @ref="_virtualizeRef"> *@
         
-    @foreach (var gate in OpenGates.OrderByDescending(x => x.active_users))
+    @foreach (var gate in ActiveGates.OrderByDescending(x => x.active_users))
     {
         gate.UseCustomFont = false;
         #if DEBUG
@@ -61,7 +61,7 @@
 @code{
 
     public string status { get; set; } = "N/A";
-    private IEnumerable<StargateInfo> OpenGates { get; set; } = new StargateInfo[0];
+    private IEnumerable<StargateInfo> ActiveGates { get; set; } = new StargateInfo[0];
     //private MudVirtualize<StargateModel>? _virtualizeRef;
 
     async void UpdateGatesAsync()
@@ -71,7 +71,7 @@
 
         if (data != null)
         {
-            OpenGates = data;
+            ActiveGates = data;
             //await _virtualizeRef.RefreshDataAsync();
         }
 
@@ -86,7 +86,9 @@
         }
     }
 
-    private int TotalUsers() => OpenGates.Sum(x => x.active_users);
+    private int TotalUsers() => ActiveGates.Sum(x => x.active_users);
+
+    private IEnumerable<StargateInfo> OpenGates() => ActiveGates.Where(x => x.gate_status == "OPEN");
 
     private bool CoinFlip() => new Random().Next(2) == 1;
 
