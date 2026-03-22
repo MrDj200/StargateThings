@@ -15,6 +15,9 @@
     {
         OPEN,
         IDLE,
+        INCOMING7,
+        INCOMING8,
+        INCOMING9,
         UNKNOWN
     }
 
@@ -46,10 +49,15 @@
             _ => StargateType.Unknown
         };
 
+
+        //https://github.com/Ancients-of-Resonite/stargate-network/blob/master/apps/sgn-socket/src/types/stargate.ts#L13C26-L13C35
         public GateStatus Status => gate_status switch
         {
             var code when code == "IDLE" => GateStatus.IDLE,
             var code when code == "OPEN" => GateStatus.OPEN,
+            var code when code == "INCOMING7" => GateStatus.INCOMING7,
+            var code when code == "INCOMING8" => GateStatus.INCOMING8,
+            var code when code == "INCOMING9" => GateStatus.INCOMING9,
             _ => GateStatus.UNKNOWN
         };
 
