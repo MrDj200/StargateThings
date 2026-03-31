@@ -4,6 +4,7 @@
 @inject IJSRuntime JSRuntime
 @inject ISnackbar Snackbar
 @inject AppBarState AppBarState
+@inject HttpClient HttpClient
 
 
 <PageTitle>Home</PageTitle>
@@ -67,8 +68,7 @@
 
     async void UpdateGatesAsync()
     {
-        var http = new HttpClient();
-        var data = await http.GetFromJsonAsync<List<StargateInfo>>("https://cors-proxy.djs-cors-proxy.workers.dev/");
+        var data = await HttpClient.GetFromJsonAsync<List<StargateInfo>>("https://cors-proxy.djs-cors-proxy.workers.dev/");
 
         if (data != null)
         {
