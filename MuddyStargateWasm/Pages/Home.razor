@@ -3,6 +3,7 @@
 @using System.Text
 @inject IJSRuntime JSRuntime
 @inject ISnackbar Snackbar
+@inject AppBarState AppBarState
 
 
 <PageTitle>Home</PageTitle>
@@ -76,6 +77,11 @@
         }
 
         StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        AppBarState.SetRefresh(UpdateGatesAsync);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
