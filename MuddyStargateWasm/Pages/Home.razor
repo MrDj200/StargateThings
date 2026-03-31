@@ -12,7 +12,6 @@
 <MudText Align="Align.Center" Typo="Typo.h4" GutterBottom="true">Found @ActiveGates.Count() active gates with @TotalUsers() active user@(TotalUsers() != 1 ? "s" : "")! @OpenGates().Count() open gates</MudText>
 
 <MudGrid Spacing="3">
-    @* <MudVirtualize Items="@OpenGates" ItemSize="250" OverscanCount="20" Context="gate" @ref="_virtualizeRef"> *@
         
     @foreach (var gate in ActiveGates.OrderByDescending(x => x.active_users))
     {
@@ -41,22 +40,15 @@
                         <MudText Inline="true">Address: </MudText><MudText Class="@gate.AddressFontClass" Inline="true" Color="Color.Secondary">@gate.gate_address</MudText><MudText Class="@gate.AddressFontClass" Inline="true" Color="Color.Primary">@gate.CleanCode</MudText>
                     </MudLink>
                     
-                    @* <MudIcon Icon="@Icons.Material.Filled.ContentCopy" Size="Size.Small" /> *@
                     <MudSpacer />
                     <MudText Inline="true">Users: </MudText>
                     <MudText Inline="true" Color=@(gate.active_users < 1 ? Color.Inherit : Color.Success)>@gate.active_users</MudText><MudText Inline="true">/@gate.max_users</MudText>
                 </MudCardContent>
                 <MudCardActions>
-                    @* @if (gate.gate_status != "IDLE")
-                    {
-                        <MudChip  T="string" Color="Color.Info" Variant="Variant.Text">@gate.gate_status</MudChip>
-                    } *@
                 </MudCardActions>
             </MudCard>
         </MudItem>
     }
-
-    @* </MudVirtualize> *@
 </MudGrid>
 
 
@@ -64,7 +56,6 @@
 
     public string status { get; set; } = "N/A";
     private IEnumerable<StargateInfo> ActiveGates { get; set; } = new StargateInfo[0];
-    //private MudVirtualize<StargateModel>? _virtualizeRef;
 
     async void UpdateGatesAsync()
     {
@@ -73,7 +64,6 @@
         if (data != null)
         {
             ActiveGates = data;
-            //await _virtualizeRef.RefreshDataAsync();
         }
 
         StateHasChanged();
