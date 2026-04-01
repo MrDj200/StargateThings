@@ -26,11 +26,11 @@
                      Class=@GetGateCardClass(gate)>
 
                 <MudCardHeader>
-                    <MudTooltip Text="@gate.session_name" Placement="Placement.Bottom">
+                    <MudTooltip Text="@gate.session_name" Placement="Placement.Top">
                         <MudText Class="clamp-1" Typo="Typo.h6" Color="@(gate.iris_state ? Color.Error : Color.Default)">@gate.session_name</MudText>
                     </MudTooltip>
                     <MudSpacer />
-                    <MudTooltip Text=@(gate.is_headless? "Headless" : "User hosted") >
+                    <MudTooltip Text=@(gate.is_headless ? "Headless" : "User hosted") Placement="Placement.Top">
                         <MudIcon Icon=@(gate.is_headless? @Icons.Material.Filled.Storage : @Icons.Material.Filled.Person)/>
                     </MudTooltip>                    
                 </MudCardHeader>
