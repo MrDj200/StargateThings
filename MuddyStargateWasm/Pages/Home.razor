@@ -63,7 +63,7 @@
 
         if (data != null)
         {
-            ActiveGates = data;
+            ActiveGates = data.OrderBy(x => x.session_name);
         }
 
         StateHasChanged();
