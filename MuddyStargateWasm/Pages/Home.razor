@@ -59,15 +59,12 @@
 
     async void UpdateGatesAsync()
     {
+        ActiveGates = new StargateInfo[0]; // Clear gates immediately to show loading state
+        StateHasChanged();
         var data = await HttpClient.GetFromJsonAsync<List<StargateInfo>>("https://cors-proxy.djs-cors-proxy.workers.dev/");
 
         if (data != null)
         {
-            ActiveGates = new StargateInfo[0];
-            StateHasChanged();
-
-            await Task.Delay(100); // Cosmetic delay to show the refresh effect
-
             ActiveGates = data.OrderBy(x => x.session_name);
         }
 
