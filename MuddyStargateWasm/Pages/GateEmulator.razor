@@ -1,0 +1,36 @@
+﻿@page "/emulated"
+@using MuddyStargateWasm.Services
+
+@inject StargateConnection connection
+
+<PageTitle>Emulated StarGate</PageTitle>
+
+<MudTextField @bind-Value="TargetAddress" Label="Outlined" Variant="Variant.Outlined" Clearable></MudTextField>
+<MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="Connect" Disabled="@connection.IsWormholeOpen">Connect</MudButton>
+<MudButton Variant="Variant.Outlined" Color="Color.Success" OnClick="Dial" Disabled="@(!connection.IsWormholeOpen)">Dial</MudButton>
+
+
+<MudSpacer/>
+<MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="Kill" Disabled="@(!connection.IsWormholeOpen)">Close Wormhole</MudButton>
+
+@code {
+    public string TargetAddress { get; set; } = "DJTESGP@";
+
+    private async void Connect(MouseEventArgs args)
+    {
+        await connection.FreshClient();
+        await connection.RequestAddress();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async void Dial()
+    {
+        await connection.DialRequest(TargetAddress);
+    }
+
+    private async void Kill()
+    {
+        await connection.CloseWormhole();
+        await InvokeAsync(StateHasChanged);
+    }
+}
