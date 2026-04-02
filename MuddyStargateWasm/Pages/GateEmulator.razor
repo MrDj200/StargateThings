@@ -6,8 +6,8 @@
 <PageTitle>Emulated StarGate</PageTitle>
 
 <MudTextField @bind-Value="TargetAddress" Label="Outlined" Variant="Variant.Outlined" Clearable></MudTextField>
-<MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="Connect" Disabled="@connection.IsWormholeOpen">Connect</MudButton>
-<MudButton Variant="Variant.Outlined" Color="Color.Success" OnClick="Dial" Disabled="@(!connection.IsWormholeOpen)">Dial</MudButton>
+<MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="Connect" Disabled="@connection.IsWSConnected">Connect</MudButton>
+<MudButton Variant="Variant.Outlined" Color="Color.Success" OnClick="Dial" Disabled="@(!connection.IsWSConnected)">Dial</MudButton>
 
 
 <MudSpacer/>

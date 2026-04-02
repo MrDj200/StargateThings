@@ -2,26 +2,51 @@
 
 namespace MuddyStargateWasm.Services
 {
+    enum MessageType
+    {
+        CloseWormhole,
+        None
+    }
+
     public class StargateConnection(ILogger<StargateConnection> logger, WebSocketService WS) : IDisposable
     {
         private static Uri uri = new Uri("wss://gatesocket.ancientsofresonite.net/");
-
         ILogger<StargateConnection> logger = logger;
 
-        public bool IsWormholeOpen => WS.IsConnected;
+        private MessageType lastSentMessageType = MessageType.None;
+
+        public bool IsWSConnected => WS.IsConnected;
+
+        public bool IsWormholeOpen { get; private set; } = false; // This needs to be listened to by the UI so we can show the correct state of the connection
 
         public async Task FreshClient()
         {
             await WS.ConnectAsync(uri.ToString());
 
-            WS.OnMessage += (message) =>
-            {
-                logger.LogInformation($"Message received from WebSocketService: {message}");
-            };
+            WS.OnMessage += HandleMessage;
             WS.OnDisconnected += () =>
             {
                 logger.LogWarning($"WebSocketService disconnected :(");
             };
+        }
+
+        private async void HandleMessage(string message)
+        {
+            logger.LogInformation($"Message received from WebSocketService: {message}");
+            if (message == "200")
+            {
+                switch (lastSentMessageType)
+                {
+                    case MessageType.CloseWormhole:
+                        IsWormholeOpen = false;
+                        break;
+                    case MessageType.None:
+                        logger.LogWarning("Received a 200 but we had nothing waiting for a response. This should not happen");
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         public async Task RequestAddress()
@@ -53,6 +78,7 @@ namespace MuddyStargateWasm.Services
             };
 
             await WS.SendAsync(dialRequest.ToString());
+            IsWormholeOpen = true;
             logger.LogInformation($"Requested to dial a gate");
         }
 
@@ -63,6 +89,7 @@ namespace MuddyStargateWasm.Services
                 ["type"] = "closeWormhole"
             };
 
+            lastSentMessageType = MessageType.CloseWormhole;
             logger.LogInformation($"Closing wormhole connection...");
             await WS.SendAsync(close.ToString());
         }
