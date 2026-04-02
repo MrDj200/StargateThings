@@ -18,9 +18,12 @@
 
     private async void Connect(MouseEventArgs args)
     {
+        connection.OnChange += () => InvokeAsync(StateHasChanged);
+        
         await connection.FreshClient();
         await connection.RequestAddress();
         await InvokeAsync(StateHasChanged);
+        
     }
 
     private async void Dial()

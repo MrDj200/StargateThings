@@ -5,6 +5,7 @@ namespace MuddyStargateWasm.Services
     enum MessageType
     {
         CloseWormhole,
+        DialRequest,
         None
     }
 
@@ -17,7 +18,21 @@ namespace MuddyStargateWasm.Services
 
         public bool IsWSConnected => WS.IsConnected;
 
-        public bool IsWormholeOpen { get; private set; } = false; // This needs to be listened to by the UI so we can show the correct state of the connection
+        private bool isWormholeOpen = false;
+        public bool IsWormholeOpen 
+        { 
+            get => isWormholeOpen;
+            private set
+            {
+                if (isWormholeOpen != value)
+                {
+                    isWormholeOpen = value;
+                    OnChange?.Invoke();
+                }
+            }
+        }
+
+        public event Action? OnChange;
 
         public async Task FreshClient()
         {
@@ -26,22 +41,46 @@ namespace MuddyStargateWasm.Services
             WS.OnMessage += HandleMessage;
             WS.OnDisconnected += () =>
             {
+                IsWormholeOpen = false;
+                OnChange?.Invoke();
                 logger.LogWarning($"WebSocketService disconnected :(");
             };
         }
 
         private async void HandleMessage(string message)
         {
-            logger.LogInformation($"Message received from WebSocketService: {message}");
+            logger.LogDebug($"Message received from WebSocketService: {message}");
             if (message == "200")
             {
                 switch (lastSentMessageType)
                 {
                     case MessageType.CloseWormhole:
                         IsWormholeOpen = false;
+                        lastSentMessageType = MessageType.None;
                         break;
                     case MessageType.None:
                         logger.LogWarning("Received a 200 but we had nothing waiting for a response. This should not happen");
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else if (message.StartsWith("CS"))
+            {
+                var split = message.Split(':');
+
+                switch (split[0])
+                {
+                    case "CSDialCheck":
+                        if (split[1] == "200" && lastSentMessageType == MessageType.DialRequest)
+                        {
+                            IsWormholeOpen = true;
+                            lastSentMessageType = MessageType.None;
+                        }else if (split[1] == "403" && lastSentMessageType == MessageType.DialRequest)
+                        {
+                            isWormholeOpen = false;
+                            lastSentMessageType = MessageType.None;
+                        }
                         break;
                     default:
                         break;
@@ -78,8 +117,8 @@ namespace MuddyStargateWasm.Services
             };
 
             await WS.SendAsync(dialRequest.ToString());
-            IsWormholeOpen = true;
-            logger.LogInformation($"Requested to dial a gate");
+            lastSentMessageType = MessageType.DialRequest;
+            logger.LogInformation($"Requested to dial gate {address}");
         }
 
         public async Task CloseWormhole()

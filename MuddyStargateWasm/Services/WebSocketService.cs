@@ -1,5 +1,7 @@
-﻿using System.Net.WebSockets;
+﻿using System.Net;
+using System.Net.WebSockets;
 using System.Text;
+using System.Text.Json.Nodes;
 
 namespace MuddyStargateWasm.Services
 {
@@ -14,7 +16,7 @@ namespace MuddyStargateWasm.Services
 
         public async Task ConnectAsync(string url)
         {
-            Logger.LogInformation($"Attempting to connect to WebSocket at {url}...");
+            Logger.LogDebug($"Attempting to connect to WebSocket at {url}...");
             _ws = new ClientWebSocket();
             _cts = new CancellationTokenSource();
 
@@ -22,13 +24,14 @@ namespace MuddyStargateWasm.Services
 
             _ = ReceiveLoop(); // fire and forget
             _ = DisconnectionLoop();
+            _ = KeepAliveLoop();
         }
 
         public async Task SendAsync(string message)
         {
             if (!IsConnected) return;
 
-            Logger.LogInformation($"Sending message: {message}");
+            Logger.LogDebug($"Sending message: {message}");
 
             var bytes = Encoding.UTF8.GetBytes(message);
             await _ws.SendAsync(bytes, WebSocketMessageType.Text, true, _cts.Token);
@@ -62,7 +65,7 @@ namespace MuddyStargateWasm.Services
                 OnMessage?.Invoke(message);
             }
 
-            Logger.LogWarning("RECEIVING STOPPED!");
+            Logger.LogDebug("RECEIVING STOPPED!");
         }
 
         public event Action? OnDisconnected;
@@ -74,6 +77,40 @@ namespace MuddyStargateWasm.Services
             }
             Logger.LogWarning("Websocket disconnected!");
             OnDisconnected?.Invoke();
+        }
+
+        public event Action? OnKeepAlive;
+        private async Task KeepAliveLoop()
+        {
+            try
+            {
+                while (_ws.State == WebSocketState.Open)
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(60), _cts.Token);
+
+                    if (_ws.State != WebSocketState.Open)
+                        break;
+
+                    dynamic keepAliveMessage = new JsonObject()
+                    {
+                        ["type"] = "keepAlive"
+                    };
+
+                    await this.SendAsync(keepAliveMessage.ToString());
+
+                    OnKeepAlive?.Invoke();
+                    Logger.LogDebug("Keepalive sent");
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                // normal on disconnect
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "KeepAlive loop crashed");
+                await this.DisconnectAsync();
+            }
         }
     }
 }

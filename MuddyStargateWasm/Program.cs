@@ -13,7 +13,12 @@ namespace MuddyStargateWasm
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
+#if DEBUG
+            builder.Logging.SetMinimumLevel(LogLevel.Debug);
+#else
             builder.Logging.SetMinimumLevel(LogLevel.Information);
+#endif
+
 
             builder.Services.AddMudServices();
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
