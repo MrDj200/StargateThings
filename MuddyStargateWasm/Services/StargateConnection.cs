@@ -19,8 +19,8 @@ namespace MuddyStargateWasm.Services
         public bool IsWSConnected => WS.IsConnected;
 
         private bool isWormholeOpen = false;
-        public bool IsWormholeOpen 
-        { 
+        public bool IsWormholeOpen
+        {
             get => isWormholeOpen;
             private set
             {
@@ -43,7 +43,6 @@ namespace MuddyStargateWasm.Services
             {
                 IsWormholeOpen = false;
                 OnChange?.Invoke();
-                logger.LogWarning($"WebSocketService disconnected :(");
             };
         }
 
@@ -76,7 +75,8 @@ namespace MuddyStargateWasm.Services
                         {
                             IsWormholeOpen = true;
                             lastSentMessageType = MessageType.None;
-                        }else if (split[1] == "403" && lastSentMessageType == MessageType.DialRequest)
+                        }
+                        else if (split[1] == "403" && lastSentMessageType == MessageType.DialRequest)
                         {
                             isWormholeOpen = false;
                             lastSentMessageType = MessageType.None;
@@ -137,5 +137,7 @@ namespace MuddyStargateWasm.Services
         {
             await CloseWormhole();
         }
+
+        public async Task Disconnect() => await WS.DisconnectAsync();
     }
 }

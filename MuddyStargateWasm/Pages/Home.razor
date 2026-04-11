@@ -5,6 +5,7 @@
 @inject ISnackbar Snackbar
 @inject AppBarState AppBarState
 @inject HttpClient HttpClient
+@inject ILogger<Home> logger
 
 
 <PageTitle>Home</PageTitle>
@@ -52,7 +53,7 @@
 </MudGrid>
 
 
-@code{
+    @code{
 
     public string status { get; set; } = "N/A";
     private IEnumerable<StargateInfo> ActiveGates { get; set; } = new StargateInfo[0];
@@ -66,6 +67,11 @@
         if (data != null)
         {
             ActiveGates = data.OrderBy(x => x.session_name);
+        }
+        else
+        {
+            logger.LogCritical("API response invalid!");
+            return; // If API doesn't respond, this prevents the page from loading any further
         }
 
         StateHasChanged();

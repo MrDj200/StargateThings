@@ -6,7 +6,15 @@
 <PageTitle>Emulated StarGate</PageTitle>
 
 <MudTextField @bind-Value="TargetAddress" Label="Outlined" Variant="Variant.Outlined" Clearable></MudTextField>
-<MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="Connect" Disabled="@connection.IsWSConnected">Connect</MudButton>
+@if (connection.IsWSConnected)
+{
+    <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="Disconnect">Disconnect</MudButton>
+}else
+{
+    <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="Connect">Connect</MudButton>
+}
+
+
 <MudButton Variant="Variant.Outlined" Color="Color.Success" OnClick="Dial" Disabled="@(!connection.IsWSConnected)">Dial</MudButton>
 
 
@@ -19,11 +27,11 @@
     private async void Connect(MouseEventArgs args)
     {
         connection.OnChange += () => InvokeAsync(StateHasChanged);
-        
+
         await connection.FreshClient();
         await connection.RequestAddress();
         await InvokeAsync(StateHasChanged);
-        
+
     }
 
     private async void Dial()
@@ -34,6 +42,11 @@
     private async void Kill()
     {
         await connection.CloseWormhole();
+        await InvokeAsync(StateHasChanged);
+    }
+    private async Task Disconnect(MouseEventArgs args)
+    {
+        await connection.Disconnect();
         await InvokeAsync(StateHasChanged);
     }
 }
